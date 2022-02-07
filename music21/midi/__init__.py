@@ -1280,10 +1280,14 @@ class MidiTrack(prebase.ProtoM21Object):
         :class:`~music21.midi.DeltaTime`
         and :class:`~music21.midi.MidiEvent` objects.
         '''
+        headerExists = True
         if not midiBytes[:4] == self.headerId:
-            raise MidiException('badly formed midi string: missing leading MTrk')
+            headerExists = False
         # get the 4 chars after the MTrk encoding
-        length, midiBytes = getNumber(midiBytes[4:], 4)
+        if headerExists:
+            length, midiBytes = getNumber(midiBytes[4:], 4)
+        else:
+            length, midiBytes = getNumber(midiBytes, len(midiBytes))
         # environLocal.printDebug(['MidiTrack.read(): got chunk size', length])
 
         # all event data is in the track str
